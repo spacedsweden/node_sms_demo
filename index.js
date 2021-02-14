@@ -94,7 +94,7 @@ app.post('/incomingSMS', async function (req, res) {
 });
 
 app.post('/deliveryReport', function (req, res) {
-  log('Delivery report: '.bright.blue + JSON.stringify(req.body, null, 4));
+  log('Delivery report: '.bright.blue, JSON.stringify(req.body));
   res.status(200);
   res.end();
 });

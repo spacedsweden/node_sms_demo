@@ -37,7 +37,7 @@ ngrok.connect(ngrokConfig).then((url) => {
   log(`Server now available at ` + `${url}/incomingSMS`);
   console.log(
     'Local inspector can be found at:' +
-      'https://localhost:4040'.yellow.underline.underline
+      'http://localhost:4040'.yellow.underline.underline
   );
   console.log(
     'If you havent already please make sure to configure your callback url in the portal' +
