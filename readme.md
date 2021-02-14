@@ -12,7 +12,6 @@ Installation:
 ```shell
 git clone https://github.com/spacedsweden/node_sms_demo
 npm install
-
 ```
 
 Before you can use this out of the box you need a to gather your account details from the [Dashboard](https://dashboard.sinch.com/sms/api)
@@ -32,7 +31,7 @@ Now you are ready to test it out
 npn start
 ```
 
-Take note of the callback url,
+Take note of the callback url, go your [dasbhoard](https://dashboard.sinch.com/sms/api/rest) and change the callback url to the ngrok domain you see.
 
 Open NGROK inspector <http://localhost:4040/inspect/http> and send an SMS to the number you specified in From.
 
