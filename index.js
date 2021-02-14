@@ -3,6 +3,7 @@ const { config } = require('./config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+const axios = require('axios');
 
 //helper things to make loggin nice
 const log = require('ololog').configure({
@@ -30,12 +31,30 @@ if (argv.ngrok != '') {
 app.use(bodyParser.json());
 
 /**
+ * Fetching a random Dadjoke
+ *
+ * @returns {string} the joke
+ */
+async function getDadJoke() {
+  var options = {
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      'User-Agent': 'Demo app ' + config.externalUrl,
+    },
+  };
+  var response = await axios.get('https://icanhazdadjoke.com/', options);
+  log(response.data);
+  return response.data.joke;
+}
+
+/**
  * Sending Text Message to a number
  * @param {*} number - who to send to  sender
  * @param {*} text - what do you want to send
  * @returns
  */
-function sendSMS(number, text) {
+async function sendSMS(number, text) {
   var messageData = {
     from: config.from,
     to: [number],
@@ -43,6 +62,7 @@ function sendSMS(number, text) {
     callback_url: config.externalUrl + '/deliveryReport',
     delivery_report: 'full',
   };
+
   var options = {
     method: 'POST',
     url:
@@ -54,30 +74,31 @@ function sendSMS(number, text) {
       'content-type': 'application/json',
       Authorization: 'Bearer ' + config.token,
     },
-    body: JSON.stringify(messageData),
+    data: messageData,
   };
 
-  request(options, function (error, response, body) {
-    log('Incoming SMS: '.bright.blue, JSON.parse(body));
-    if (error) throw new Error(error);
-  });
+  var response = await axios.request(options);
+  log('SMS Sent: '.bright.blue, response.data);
 }
 
-app.post('/incomingSMS', function (req, res) {
-  log('Incoming SMS: '.bright.blue, req.body);
-  if (req.body) {
-    sendSMS(req.body.from, 'You send me:' + req.body.body);
+app.post('/incomingSMS', async function (req, res) {
+  try {
+    log('Incoming SMS: '.bright.blue, req.body);
+    //var messageText = await getDadJoke();
+    await sendSMS(req.body.from, 'You sent me: ' + req.body.body);
+    res.status(200);
+    res.end();
+  } catch (error) {
+    log(error);
   }
-  res.status(200);
-  res.end();
 });
 
 app.post('/deliveryReport', function (req, res) {
-  log('Delivery report: ' + JSON.stringify(req.body, null, 4));
+  log('Delivery report: '.bright.blue + JSON.stringify(req.body, null, 4));
   res.status(200);
   res.end();
 });
 
 app.listen(config.port, () => {
-  log(`Send an SMS to ${config.from}`);
+  log(`Send an SMS to ${config.from}`.yellow);
 });
