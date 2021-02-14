@@ -44,29 +44,32 @@ Open NGROK inspector <http://localhost:4040/inspect/http> and send an SMS to the
 
 The static reply that echos back what you sent it is pretty boring, lets reply with a joke instead.
 
-Open `index.js' and find below in the in incomingSMS and add getDadJoke
+Open `index.js' and find below in the in incomingSMS and remove the comment infront of GetDadjoke and change send sms to use the messageText as body instead.
 
-original
+**Original:**
 
 ```javascript
 app.post('/incomingSMS', async function (req, res) {
-  log('Incoming SMS: '.bright.blue, req.body);
-  if (req.body) {
-    sendSMS(req.body.from, 'You send me:' + req.body.body);
+  try {
+    log('Incoming SMS: '.bright.blue, req.body);
+    //var messageText = await getDadJoke();
+    await sendSMS(req.body.from, 'You sent me: ' + req.body.body);
+    res.status(200);
+    res.end();
+  } catch (error) {
+    log(error);
   }
-  res.status(200);
-  res.end();
 });
 ```
 
-After changes
+**After change:**
 
 ```javascript
 app.post('/incomingSMS', async function (req, res) {
   try {
     log('Incoming SMS: '.bright.blue, req.body);
     var messageText = await getDadJoke();
-    sendSMS(req.body.from, messageText);
+    await sendSMS(req.body.from, messageText);
     res.status(200);
     res.end();
   } catch (error) {
