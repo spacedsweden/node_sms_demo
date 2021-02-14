@@ -4,6 +4,19 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 
+//helper things to make loggin nice
+const log = require('ololog').configure({
+  time: true,
+  locate: false,
+  concat: { separator: '' },
+  stringify: {
+    pretty: true,
+    fancy: true,
+    maxArrayLength: 20,
+    rightAlignKeys: false,
+  },
+});
+require('ansicolor').nice;
 //get ngrok domain if any
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
@@ -11,9 +24,8 @@ const argv = yargs(hideBin(process.argv)).argv;
 config.externalUrl = 'http://localhost:3000';
 if (argv.ngrok != '') {
   config.externalUrl = argv.ngrok;
-  console.log('Will use ' + config.externalUrl + ' as callback');
 } else {
-  console.log('use npm start to get ngrok domain');
+  log.bright.red.underline('use npm start to get ngrok domain');
 }
 app.use(bodyParser.json());
 
@@ -29,7 +41,7 @@ function sendSMS(number, text) {
     to: [number],
     body: text,
     callback_url: config.externalUrl + '/deliveryReport',
-    delivery_report: 'per_recipient',
+    delivery_report: 'full',
   };
   var options = {
     method: 'POST',
@@ -46,27 +58,26 @@ function sendSMS(number, text) {
   };
 
   request(options, function (error, response, body) {
+    log('Incoming SMS: '.bright.blue, JSON.parse(body));
     if (error) throw new Error(error);
-    console.log('Message sent: ' + body);
   });
 }
 
 app.post('/incomingSMS', function (req, res) {
-  console.log('Incoming SMS: ' + req.body);
+  log('Incoming SMS: '.bright.blue, req.body);
   if (req.body) {
-    sendSMS(req.body.from, 'You send me: ' + req.body.body);
+    sendSMS(req.body.from, 'You send me:' + req.body.body);
   }
   res.status(200);
   res.end();
 });
 
 app.post('/deliveryReport', function (req, res) {
-  console.log('Delivery report: ' + JSON.stringify(req.body));
-
+  log('Delivery report: ' + JSON.stringify(req.body, null, 4));
   res.status(200);
   res.end();
 });
 
 app.listen(config.port, () => {
-  console.log(`Listening at http://localhost:${config.port}`);
+  log(`Send an SMS to ${config.from}`);
 });
