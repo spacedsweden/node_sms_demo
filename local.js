@@ -34,10 +34,13 @@ if (config.externalUrl === '') {
 }
 log;
 ngrok.connect(ngrokConfig).then((url) => {
-  log(`Server now available at ` + `${url}/incomingSMS`.yellow);
-  console.log('Local inspector can be found at:' + 'http://localhost:4040');
+  log('Local inspector can be found at:' + 'http://localhost:4040');
+  log(
+    `Configure your callback to in the dashboard to: ` +
+      `${url}/incomingSMS`.yellow
+  );
   console.log(
-    'If you havent already please make sure to configure your callback url in the portal' +
+    'Make sure to configure your callback url in the portal' +
       `\nhttps://dashboard.sinch.com/sms/api/rest/`.yellow.underline +
       '\nWe copied the url so you can just paste it in to callback url field at that page'
   );
