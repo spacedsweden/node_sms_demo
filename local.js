@@ -39,7 +39,7 @@ ngrok.connect(ngrokConfig).then((url) => {
     `Configure your callback to in the dashboard to: ` +
       `${url}/incomingSMS`.yellow
   );
-  console.log(
+  log(
     'Make sure to configure your callback url in the portal' +
       `\nhttps://dashboard.sinch.com/sms/api/rest/`.yellow.underline +
       '\nWe copied the url so you can just paste it in to callback url field at that page'
@@ -54,15 +54,15 @@ ngrok.connect(ngrokConfig).then((url) => {
 nodemon
   .on('start', async () => {})
   .on('quit', async () => {
-    console.log('killing app.js');
+    log('killing app.js');
     config.externalUrl = '';
     await ngrok.kill();
   })
-  .on('crash', function () {
-    console.log('crash app.js');
+  .on('crash', function (e) {
+    log('crash app.js'), e;
     config.externalUrl = '';
     ngrok.kill();
   })
   .on('restart', function (files) {
-    console.log('App restarted due to: ', files);
+    log('App restarted due to: ', files);
   });
