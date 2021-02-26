@@ -7,6 +7,8 @@ const config = {
   port: 3030,
   ngrokdomain: process.env.NGROK_DOMAIN, //if you have a paid account you can set  ngrok subdomain here
   externalUrl: '', //leaveblank, will be overwritten by ngrok start
+  voiceKey: process.env.VOICEKEY,
+  voiceSecret: process.env.VOICESECRET,
 };
 
 module.exports = {

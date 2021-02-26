@@ -48,6 +48,35 @@ async function getDadJoke() {
   return response.data.joke;
 }
 
+async function makeCallout(number, text) {
+  var postData = {
+    method: 'ttsCallout',
+    ttsCallout: {
+      cli: '+14158544063',
+      destination: { type: 'number', endpoint: number },
+      domain: 'pstn',
+      custom: 'customData',
+      locale: 'en-US',
+      text: text,
+    },
+  };
+
+  var options = {
+    method: 'POST',
+    url: 'https://calling.api.sinch.com/calling/v1/callouts',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+    },
+    auth: {
+      username: 'application\\' + config.voiceKey,
+      password: config.voiceSecret,
+    },
+    data: postData,
+  };
+  var response = await axios.request(options);
+  log('Callout made Sent: '.bright.blue, response.data);
+}
 /**
  * Sending Text Message to a number
  * @param {*} number - who to send to  sender
@@ -84,8 +113,9 @@ async function sendSMS(number, text) {
 app.post('/incomingSMS', async function (req, res) {
   try {
     log('Incoming SMS: '.bright.blue, req.body);
-    //var messageText = await getDadJoke();
-    await sendSMS(req.body.from, 'You sent me: ' + req.body.body);
+    var messageText = await getDadJoke();
+    await sendSMS(req.body.from, messageText);
+    //  await makeCallout(req.body.from, messageText);
     res.status(200);
     res.end();
   } catch (error) {
@@ -95,6 +125,7 @@ app.post('/incomingSMS', async function (req, res) {
 
 app.post('/deliveryReport', function (req, res) {
   log('Delivery report: '.bright.blue, req.body);
+
   res.status(200);
   res.end();
 });

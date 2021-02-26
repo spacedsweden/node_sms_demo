@@ -41,7 +41,8 @@ ngrok.connect(ngrokConfig).then((url) => {
   );
   log(
     'Make sure to configure your callback url in the portal' +
-      `\nhttps://dashboard.sinch.com/sms/api/rest/`.yellow.underline +
+      `\nhttps://dashboard.sinch.com/sms/api/rest/${config.service_plan_id}`
+        .yellow.underline +
       '\nWe copied the url so you can just paste it in to callback url field at that page'
   );
 
