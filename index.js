@@ -130,6 +130,81 @@ app.post('/deliveryReport', function (req, res) {
   res.end();
 });
 
+app.post('/incomingCall', function (req, res) {
+  if (req.body.event == 'ice') {
+    //+1 415-854-4063
+    var data = {
+      action: {
+        name: 'RunMenu',
+        barge: true,
+        menus: [
+          {
+            id: 'main',
+            mainPrompt:
+              '#tts[Welcome to the conference menu. enter your your conference code. ]',
+            maxDigits: 4,
+            // options: [
+            //   // {
+            //   //  dtmf:1234
+            //   //   action: 'return(support)',
+            //   // },
+            //   {
+            //     dtmf: '0',
+            //     action: 'menu(sub)',
+            //   },
+            // ],
+          },
+          {
+            id: 'sub',
+            mainPrompt:
+              '#tts[Welcome to the sub menu. Enter your 4-digit PIN.];#href[http://your.host.com/media_file.mp3]',
+            repeatPrompt:
+              '#tts[Enter your 4-digit PIN.];http://your.host.com/media_file.mp3',
+            repeats: 3,
+            maxDigits: 4,
+          },
+        ],
+      },
+    };
+    log('incoming call report: '.bright.blue, req.body);
+    res.json(data);
+    res.status(200);
+    res.end();
+  } else if (req.body.event == 'pie') {
+    log('PIE event: '.bright.blue, req.body);
+    var response = {};
+    if (req.body.menuResult.value == '1234') {
+      response = {
+        action: {
+          name: 'ConnectConf',
+          conferenceId: 'myConference',
+          moh: 'ring',
+        },
+      };
+    } else {
+      response = {
+        instructions: [
+          {
+            name: 'Say',
+            text: 'Wrong code, bye',
+            locale: 'en-US',
+          },
+        ],
+        action: {
+          name: 'hangup',
+        },
+      };
+    }
+    res.json(response);
+    res.status(200);
+    res.end();
+  } else {
+    log('other event: '.bright.blue, req.body);
+    res.status(200);
+    res.end();
+  }
+});
+
 app.listen(config.port, () => {
   log(`Send an SMS to ${config.from}`.yellow);
 });

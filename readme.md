@@ -96,3 +96,5 @@ async function getDadJoke() {
 ```
 
 Now send an sms to your phonenumber listed in the console and have a laugh
+
+New feature added, callouts. uncomment the code makeCallout to test our TTS feature
