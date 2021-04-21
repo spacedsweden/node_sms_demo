@@ -136,30 +136,40 @@ app.post('/incomingCall', function (req, res) {
     var data = {
       action: {
         name: 'RunMenu',
+        enableVoice: true,
+        locale: 'en-US',
         barge: true,
+        mainMenu: 'main',
         menus: [
           {
             id: 'main',
             mainPrompt:
-              '#tts[Welcome to the conference menu. enter your your conference code. ]',
+              '#tts[Welcome to the conference menu. enter say or press 1 or 0.',
+            repeatPrompt: 'Come on, one or zero',
+            options: [
+              {
+                dtmf: '1',
+                action: 'return(sub2)',
+              },
+              {
+                dtmf: '0',
+                action: 'menu(sub)',
+              },
+            ],
+          },
+          {
+            id: 'sub2',
+            mainPrompt:
+              '#tts[Welcome to the sub menu 2. Enter your 4-digit PIN.]',
+            repeatPrompt: '#tts[Enter your 4-digit PIN.]',
+            repeats: 3,
             maxDigits: 4,
-            // options: [
-            //   // {
-            //   //  dtmf:1234
-            //   //   action: 'return(support)',
-            //   // },
-            //   {
-            //     dtmf: '0',
-            //     action: 'menu(sub)',
-            //   },
-            // ],
           },
           {
             id: 'sub',
             mainPrompt:
-              '#tts[Welcome to the sub menu. Enter your 4-digit PIN.];#href[http://your.host.com/media_file.mp3]',
-            repeatPrompt:
-              '#tts[Enter your 4-digit PIN.];http://your.host.com/media_file.mp3',
+              '#tts[Welcome to the sub menu. Enter your 4-digit PIN.]',
+            repeatPrompt: '#tts[Enter your 4-digit PIN.]',
             repeats: 3,
             maxDigits: 4,
           },
@@ -182,6 +192,7 @@ app.post('/incomingCall', function (req, res) {
         },
       };
     } else {
+      console.log(req.body.menuResult);
       response = {
         instructions: [
           {
